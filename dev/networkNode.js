@@ -88,7 +88,7 @@ app.get('/mine', (req, res) => {
     requestPromises.push(rp(requestOptions));
   });
 
-  Promise.all(reqeustPromises)
+  Promise.all(requestPromises)
     .then(data => {
       const requestOptions = {
         uri: bitcoin.currentNodeUrl + '/transaction/broadcast',
@@ -110,6 +110,7 @@ app.get('/mine', (req, res) => {
   });
 });
 
+
 app.post('/receive-new-block', (req, res) => { 
   // 블록 유효성 확인을 위해 1. 해시 검증 2. 인덱스(번호) 검증
   const newBlock = req.body.newBlock;
@@ -118,9 +119,9 @@ app.post('/receive-new-block', (req, res) => {
   const validIndex = lastBlock['index'] + 1 === newBlock['index']
 
   if (validHash && validIndex) {
-    // chain은 어디에???????????????????????
+    // chain은 어디에??????????????????????
     bitcoin.chain.push(newBlock);
-    bitcoin.pedningTransactions = [];
+    bitcoin.pendingTransactions = [];
     res.json({
       note: 'New block received and accepted',
       newBlock: newBlock
