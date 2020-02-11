@@ -205,7 +205,6 @@ app.post('/register-node', (req, res) => {
 //  register multiple nodes at once 
 app.post('/register-nodes-bulk', (req, res) => {
   const allNetworkNodes = req.body.allNetworkNodes;
-  console.log('allNetworkNodes => ', allNetworkNodes);
   allNetworkNodes.forEach(networkNodeUrl => {
     const nodeNotAlreadyPresent = bitcoin.networkNodes.indexOf(networkNodeUrl) == -1;
     const notCurrentNode = bitcoin.currentNodeUrl !== networkNodeUrl;
