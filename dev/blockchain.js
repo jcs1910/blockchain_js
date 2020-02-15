@@ -3,11 +3,6 @@ const uuid = require('uuid/v1');
 
 const currentNodeUrl = process.argv[3];
 
-console.log('uuid', uuid)
-console.log('uuid()', uuid())
-console.log('uuid().split('-')', uuid().split('-'))
-console.log("uuid().split('-').join('')", uuid().split('-').join(''))
-
 function Blockchain() {
   this.chain = [];
   this.pendingTransactions = [];
@@ -79,40 +74,42 @@ Blockchain.prototype.proofOfWork = function(previousBlockHash, currentBlockData)
 
 Blockchain.prototype.chainIsValid = function(blockchain) {
   let validChain = true;
+  console.log('validChain =>1 ', validChain) 
   
-  console.log('validChain => ', validChain) 
   // compare the current block to the previous block
   for (let i = 1; i < blockchain.length; i++) {
     const currentBlock = blockchain[i];
-    const previousBlock = blockchain[i - 1];
-    const blockHash = this.hashBlock(previousBlock['hash'], { index: currentBlock['index'], transactions: currentBlock['transactions'] }, currentBlock['nonce']);
-    
-    // 2. 모든 블록이 correct data 가졌는지 체크 
-    if (blockHash.substring(0, 4) !== '0000') validChain = false; 
+    const previousBlockHash = blockchain[i - 1];
+    const hashBlock = this.hashBlock(previousBlockHash['hash'], { transactions: currentBlock['transactions'], index: currentBlock['index'] }, currentBlock['index']);
 
+    console.log('hashBlock ' , hashBlock)
+    // 2. 모든 블록이 동일한 데이터를 가졌는지 체크 
+    if (hashBlock.substring(0, 4) !== '0000') validChain = false; 
+    console.log('validChain =>2 ', validChain) 
+ 
     // 1. 해시 검증
-    if (currentBlock['previousBlockHash'] !== previousBlock['hash']) { //chain not valid
+    if (currentBlock['previousBlockHash'] !== previousBlockHash['hash']) { //chain not valid
       validChain = false;
+      console.log('validChain =>3 ', validChain) 
     };
   }
 
-    console.log('validChain => ', validChain) 
     // 3. Genesis Block 유효성 검증
     const genesisBlock = blockchain[0];
     const correctNonce = genesisBlock['nonce'] === 2083236893;
-    const correctPreviousHash = genesisBlock['previousBlockHash'] === '';
+    const correctPreviousHash = genesisBlock['previousBlockHash'] === '0';
     const correctHash = genesisBlock['hash'] === '000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f'
+
     // Genesis Block received 1073 transactions
     const correctTransactions = genesisBlock['transactions'].length === 0;
-    console.log('validChain => ', validChain) 
+  
+    console.log('all should be true', correctNonce, correctPreviousHash, correctHash, correctTransactions)
+    console.log('validChain =>!!! ', validChain) 
     if(!correctNonce || !correctPreviousHash || !correctHash || !correctTransactions) validChain = false;
 
     return validChain;
   
 }
-
-
-
 
 
 // or you can do the same thing in Class

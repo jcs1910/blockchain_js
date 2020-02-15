@@ -55,8 +55,7 @@ app.post('/transaction/broadcast', (req, res) => {
       json: true
     };
     requestPromises.push(rp(requestOptions));
-  });
-  
+  });  
    
   Promise.all(requestPromises)
     .then(data => {
@@ -110,7 +109,6 @@ app.get('/mine', (req, res) => {
   });
 });
 
-
 app.post('/receive-new-block', (req, res) => { 
   // 블록 유효성 확인을 위해 1. 해시 검증 2. 인덱스(번호) 검증
   const newBlock = req.body.newBlock;
@@ -144,7 +142,6 @@ app.post('/register-and-broadcast-node', (req, res) => {
     // console.log('bitcoin.networkNodes => ', bitcoin.networkNodes)
   }
   const registerNodesPromise = [];
-
 
   // broadcast a new node to the network
   // console.log('bitcoin.networkNodes ', bitcoin.networkNodes) // ['http://localhost:3002']
@@ -215,7 +212,6 @@ app.post('/register-nodes-bulk', (req, res) => {
   })
   res.json({ note: 'Successful Bulk registration '})
 });
-
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}.....changed`)
