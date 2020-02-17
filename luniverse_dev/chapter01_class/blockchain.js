@@ -28,13 +28,12 @@ class Blockchain {
     this.pendingTxs = [];
 
     return newBlock;
-  }
-
+  } 
   // get a last block
   getLastBlock() {
     return this.chain[this.chain.length - 1];
   } 
-
+  
   // create a new transaction included in a block
   createNewTx(amount, sender, recipient) {
     const newTx = {
@@ -48,7 +47,7 @@ class Blockchain {
     // the number of the block that this tx will be added to
     return this.getLastBlock()['index'] + 1
   }
-   
+
   // hash a block by using previous block hash and current block data and nonce
   hashBlock(parentHash, currentBlockData, nonce) {
     const stringData = parentHash + JSON.stringify(currentBlockData) + nonce.toString();
@@ -64,7 +63,7 @@ class Blockchain {
     while (hashVal.substring(0, 5) !== '00000') {
       nonce++;
       hashVal = this.hashBlock(parentHash, currentBlockData, nonce);
-      // console.log('hash ', hashVal)
+      console.log('hash ', hashVal)
     }
     return nonce;
   };
