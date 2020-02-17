@@ -6,20 +6,13 @@ const uuid = require('uuid/v1');
 const port = process.argv[2]; // package.json에 start에 포트를 의미함
 const rp = require('request-promise');
 
-// console.log('process.argv[3] ', process.argv[3])
-
 const nodeAddress = uuid().split('-').join('');
-// console.log('uuid() ', uuid())
-
 const bitcoin = new Blockchain();
 
-//const jsonParser = bodyParser.json();
 app.use(bodyParser.json());
-
-// const urlencodedParser = bodyParser.urlencoded({ extended:false })
 app.use(bodyParser.urlencoded({ extended:false }))
 
-// send entire blockchain
+// fetch entire blockchain
 app.get('/blockchain', function(req, res) {
   res.send(bitcoin); 
 });
@@ -27,27 +20,26 @@ app.get('/blockchain', function(req, res) {
 // send a new tx to all nodes
 app.post('/transaction', (req, res) => {
   const newTransaction = req.body
-  console.log('newTransaction => ', newTransaction) 
-  // error handling / if empty object delivered, send an error message
+  
+  //  if empty object delivered, send an error message
   if (Object.entries(newTransaction).length > 0) {
     const blockIndex = bitcoin.addTransactionToPendingTransactions(newTransaction);
-    res.json({ note: `Transaction will be added in block ${blockIndex}.` })
+    res.json({ msg: `Transaction will be added in block ${blockIndex}.` })
   } else {
-    res.json({note: 'error'})
+    res.json({msg: 'error occured'})
   }
 });
 
 app.post('/transaction/broadcast', (req, res) => {
   const body = req.body;
 
-
   const newTransaction = bitcoin.createNewTransaction(body.amount, body.sender, body.recipient);
   bitcoin.addTransactionToPendingTransactions(newTransaction);
 
   const requestPromises = [];
-  // use  '/transaction' api to broadcast the new Tx to all network nodes
+  // use '/transaction' API to broadcast the new Tx to all network nodes
   bitcoin.networkNodes.forEach(networkNodeUrl => {
-    console.log('netNodeUrl ', networkNodeUrl)
+    // console.log('netNodeUrl ', networkNodeUrl)
     const requestOptions = {
       uri: networkNodeUrl + '/transaction',
       method: 'POST',
@@ -55,12 +47,11 @@ app.post('/transaction/broadcast', (req, res) => {
       json: true
     };
     requestPromises.push(rp(requestOptions));
-  });
-  
+  });  
    
   Promise.all(requestPromises)
     .then(data => {
-      res.json({ note: 'Transaction created and broadcast successfully' })
+      res.json({ msg: 'Transaction created and broadcast successfully' })
     });
 });
 
@@ -104,31 +95,29 @@ app.get('/mine', (req, res) => {
     })
     .then(data => {
     res.json({
-      note: "New block mined and broadcast Successfully",
+      msg: "New block mined and broadcast Successfully",
       block: newBlock
     })
   });
 });
 
-
 app.post('/receive-new-block', (req, res) => { 
-  // 블록 유효성 확인을 위해 1. 해시 검증 2. 인덱스(번호) 검증
+  // to validate a valid block, you need to check 1. hash 2. index(number)
   const newBlock = req.body.newBlock;
   const lastBlock = bitcoin.getLastBlock();
   const validHash = lastBlock.hash === newBlock.previousBlockHash 
   const validIndex = lastBlock['index'] + 1 === newBlock['index']
 
   if (validHash && validIndex) {
-    // chain은 어디에??????????????????????
     bitcoin.chain.push(newBlock);
     bitcoin.pendingTransactions = [];
     res.json({
-      note: 'New block received and accepted',
+      msg: 'New block received and accepted',
       newBlock: newBlock
     });
   } else {
     res.json({
-      note: 'New Block rejected',
+      msg: 'New Block rejected',
       newBlock: newBlock
     });
   }
@@ -144,7 +133,6 @@ app.post('/register-and-broadcast-node', (req, res) => {
     // console.log('bitcoin.networkNodes => ', bitcoin.networkNodes)
   }
   const registerNodesPromise = [];
-
 
   // broadcast a new node to the network
   // console.log('bitcoin.networkNodes ', bitcoin.networkNodes) // ['http://localhost:3002']
@@ -213,9 +201,8 @@ app.post('/register-nodes-bulk', (req, res) => {
     const notCurrentNode = bitcoin.currentNodeUrl !== networkNodeUrl;
     if (nodeNotAlreadyPresent && notCurrentNode) bitcoin.networkNodes.push(networkNodeUrl);
   })
-  res.json({ note: 'Successful Bulk registration '})
+  res.json({ msg: 'Successful Bulk registration '})
 });
-
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}.....changed`)

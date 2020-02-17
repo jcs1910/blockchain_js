@@ -1,36 +1,29 @@
+const Blockchain = require('./blockchain');
+
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const Blockchain = require('./blockchain');
 const uuid = require('uuid/v1');
 
-
 const nodeAddress = uuid().split('-').join('');
-console.log('uuid() ', uuid())
-console.log('nodeAddress ', nodeAddress);
 
 const bitcoin = new Blockchain();
 
-// app.use(bodyParser.json());
-const jsonParser = bodyParser.json();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
-// app.use(bodyParser.urlencoded({ extended:false })
-const urlencodedParser = bodyParser.urlencoded({ extended:false })
-
-// send entire blockchain
-app.get('/blockchain', function(req, res) {
+// fetch entire blockchain
+app.get('/blockchain', (req, res) => {
   res.send(bitcoin); 
 });
 
 // create a new transaction. This will be in pending until making another block. 
-app.post('/transaction', jsonParser, (req, res) => {
+app.post('/transaction', (req, res) => {
   const data = req.body
-  const blockIndex = bitcoin.createNewTransaction(data.amount, data.sender, data.recipient);
+  const blockIndex = bitcoin.createNewTx(data.amount, data.sender, data.recipient);
   res.json({
-    note: `Transaction will be added in block ${blockIndex}.`
+    msg: `Transaction will be added in block ${blockIndex}.`
   })
-  // console.log(req.body);
-  // res.send(`The amount of the Transaction is ${req.body.amount} bitcoin`)
 })
 
 // mine(create) a new block
@@ -43,15 +36,15 @@ app.get('/mine', (req, res) => {
     index: lastBlock['index'] + 1
   }
 
-  const nonce = bitcoin.proofOfWork(previousBlockHash, currentBlockData);
+  const nonce = bitcoin.pow(previousBlockHash, currentBlockData);
   const blockHash = bitcoin.hashBlock(previousBlockHash, currentBlockData, nonce);
 
-  bitcoin.createNewTransaction(12.5, "00", nodeAddress);
+  bitcoin.createNewTx(12.5, "00", nodeAddress);
 
   const newBlock = bitcoin.createNewBlock(nonce, previousBlockHash, blockHash)
 
   res.json({
-    note: "New block mined Successfully",
+    msg: "New block mined Successfully",
     block: newBlock
   })
 });
