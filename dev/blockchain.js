@@ -77,7 +77,7 @@ Blockchain.prototype.chainIsValid = function(blockchain) {
   console.log('validChain =>1 ', validChain) 
   
   // compare the current block to the previous block
-  for (let i = 1; i < blockchain.length; i++) {
+  for (var i = 1; i < blockchain.length; i++) {
     const currentBlock = blockchain[i];
     const previousBlockHash = blockchain[i - 1];
     const hashBlock = this.hashBlock(previousBlockHash['hash'], { transactions: currentBlock['transactions'], index: currentBlock['index'] }, currentBlock['index']);
@@ -110,7 +110,6 @@ Blockchain.prototype.chainIsValid = function(blockchain) {
     return validChain;
   
 }
-
 
 // or you can do the same thing in Class
 

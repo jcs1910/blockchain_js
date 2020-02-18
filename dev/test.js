@@ -1,17 +1,42 @@
-const Blockchain = require('./Blockchain');
+const Blockchain = require('./blockchain');
 
 const bitcoin = new Blockchain();
-
-/* Consensus Test
-const btc_validation = 
- 
-
+// Consensus Test
+const btc_validation = {
+"chain": [
+{
+"index": 0,
+"timestamp": 1581790208609,
+"transactions": [],
+"nonce": 2083236893,
+"hash": "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
+"previousBlockHash": "0"
+},
+{
+"index": 1,
+"timestamp": 1581790235968,
+"transactions": [],
+"nonce": 182255,
+"hash": "0000517e93e6a320ea73988a1b9340bde410fb2070ae566c14e969a53bdc0fb8",
+"previousBlockHash": "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f"
+}
+],
+"pendingTransactions": [
+{
+"transactionId": "76c25670501e11ea897c8902f297a1c4",
+"amount": 12.5,
+"sender": "00",
+"recipient": "66702d10501e11ea897c8902f297a1c4"
+}
+],
+"currentNodeUrl": "http://localhost:3001",
+"networkNodes": []
+}
 
 console.log('Valid => ', bitcoin.chainIsValid(btc_validation.chain));
-*/
 
-///* hash Test
 
+/* hash Test
 const previousBlockHash = 'fdsgfdsg234234dfh324t432';
 const currentBlockData = [
   {
@@ -34,6 +59,7 @@ const currentBlockData = [
 
 const nonce = 100;
 console.log(bitcoin.hashBlock(previousBlockHash, currentBlockData, nonce));
+*/
 
 /* pow Test
 const powHash = bitcoin.proofOfWork(previousBlockHash, currentBlockData);

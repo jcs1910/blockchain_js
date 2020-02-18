@@ -39,8 +39,6 @@ app.post('/transaction', (req, res) => {
 
 app.post('/transaction/broadcast', (req, res) => {
   const body = req.body;
-
-
   const newTransaction = bitcoin.createNewTransaction(body.amount, body.sender, body.recipient);
   bitcoin.addTransactionToPendingTransactions(newTransaction);
 
